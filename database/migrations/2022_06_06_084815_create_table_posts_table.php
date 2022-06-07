@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateRefreshTokenTable extends Migration
+class CreateTablePostsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,13 @@ class CreateRefreshTokenTable extends Migration
      */
     public function up()
     {
-        Schema::create('refresh_token', function (Blueprint $table) {
+        Schema::create('posts', function (Blueprint $table) {
+            $table->bigIncrements('id')->unique();
+            $table->string('title',255);
+            $table->text('content')->collation('utf8mb4_vietnamese_ci')->nullable();
+            $table->string('post_thumbnail',500)->nullable();
+            $table->string('slug',500)->unique();
             $table->string('user_id',36);
-            $table->string('refresh_token');
-            $table->timestamp('expired_at');
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
@@ -29,6 +32,6 @@ class CreateRefreshTokenTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('refresh_token');
+        Schema::dropIfExists('posts');
     }
 }

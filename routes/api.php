@@ -31,6 +31,9 @@ Route::group([
   Route::get('/email/verify', 'VerificationController@show')->name('verification.notice');
   Route::get('/email/verify/{id}', 'VerificationController@verify')->name('verification.verify');
   Route::post('/email/resend', 'VerificationController@resend')->name('verification.resend');
+  Route::get('/posts/search/{param}', 'PostController@searchByTitleOrContent');
+  Route::get('/posts/{param}', 'PostController@show');
+
 
   // Route::resources(['campaigns'=>'CampaignController']);
 
@@ -40,6 +43,12 @@ Route::group([
   ], function () {
     Route::get('/user-profile', 'AuthController@userProfile');
     Route::post('/change-pass', 'AuthController@changePassWord');
-    Route::put('/update', 'UserController@update');
+    Route::put('/update', 'AuthController@update');
+    // Route::resources(['posts' => 'PostController']);
+    Route::get('/posts', 'PostController@index');
+    Route::post('/posts',  'PostController@store');
+    Route::put('/posts/{id}',  'PostController@update');
+    Route::delete('/posts/{id}',  'PostController@destroy');
+
   });
 });
