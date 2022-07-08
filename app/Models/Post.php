@@ -2,6 +2,7 @@
 
 namespace App\Models;
 use App\Models\User;
+use App\Models\PostReport;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -18,7 +19,10 @@ class Post extends Model
      */
     public function user()
     {
-        $this->belongsTo(User::class);
+        return $this->belongsTo(User::class,'user_id')->select(['id', 'name','url_account']);
     }
 
+    public function report() {
+        return $this->hasMany(PostReport::class);
+    }
 }

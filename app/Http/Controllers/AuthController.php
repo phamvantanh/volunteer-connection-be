@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use App\Models\RefreshToken;
 use Carbon\Traits\Timestamp;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -70,7 +71,10 @@ class AuthController extends Controller
     }
     $user = User::create(array_merge(
       $validator->validated(),
-      ['password' => Hash::make($request->password)]
+      ['password' => Hash::make($request->password),
+       'url_account'=> Str::slug($request->name)."-".rand(),
+       'avatar_url'=> 'https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png',
+      ]
     ));
     $user['id']=User::where('email',  $user->email)->first()->id;
     $user->sendEmailVerificationNotification();
@@ -151,14 +155,14 @@ class AuthController extends Controller
     if ($data = $refreshToken->first()) {
       $refreshToken->delete();
       if ($data->expired_at < now()) {
-        return response()->json(['message' => 'Unauthorized'], 401);
+        return response()->json(['message' => 'Unauthorized1'], 401);
       }
       $userInfo = User::where('id',  $row->user_id)->first();
 
       $newToken = auth()->login($userInfo);
       return $this->createNewAccessTokenAndRefreshToken($newToken);
     } else {
-      return response()->json(['message' => 'Unauthorized'], 401);
+      return response()->json(['message' => 'Unauthorized2'], 401);
     }
   }
 

@@ -9,6 +9,7 @@ use App\Repositories\Post\PostRepository;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use App\Models\BookmarkedPost;
 
 
 class PostController extends Controller
@@ -24,9 +25,14 @@ class PostController extends Controller
         $this->postRepo = $postRepo;
     }
 
+    // get all post
+
     public function index()
     {
         if ($posts = $this->postRepo->getAll()) {
+            foreach ($posts as $post) {
+                $post->user->name;
+            }
             return response()->json(['posts' => $posts], Response::HTTP_OK);
         } else return response()->json(['Message' => Config::get('constants.RESPONSE.400')], Response::HTTP_BAD_REQUEST);
 
@@ -38,6 +44,9 @@ class PostController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+
+    // add new post 
+
     public function store(Request $request)
     {
         if (auth()->user()->role != 'organization') {
@@ -76,18 +85,32 @@ class PostController extends Controller
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
+
+    // get post by id or slug
+
     public function show($param)
     {
         if ($post = $this->postRepo->findByIdOrSlug($param)) {
+            $post->user;
             return response()->json(['post' => $post], Response::HTTP_OK);
         } else return response()->json(['Message' => Config::get('constants.RESPONSE.404')], Response::HTTP_NOT_FOUND);
 
     }
 
+    // search post
+
     public function searchByTitleOrContent($param)
     {   
-        if ($post = $this->postRepo->searchByTitleOrContent($param)) {
-            return response()->json(['post' => $post], Response::HTTP_OK);
+        if ($posts = $this->postRepo->searchByTitleOrContent($param)) {
+            foreach ($posts as $post) {
+                $post->user;
+                $user_id = auth()->user()?auth()->user()->id:null;
+                $post['bookmark'] = BookmarkedPost::select('*')
+                                    ->where('user_id',$user_id)
+                                    ->where('post_id',$post->id)
+                                    ->count()!==0?true:false;
+            }
+            return response()->json(['posts' => $posts], Response::HTTP_OK);
         } else return response()->json(['Message' => Config::get('constants.RESPONSE.404')], Response::HTTP_NOT_FOUND);
 
     }
@@ -99,6 +122,8 @@ class PostController extends Controller
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
+    // edit post
+
     public function update(Request $request, $id)
     {
         try {
@@ -131,11 +156,14 @@ class PostController extends Controller
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
+
+     // delete
+
     public function destroy($id)
     {
          //
          try {
-            if (auth()->user()->id == $this->postRepo->getUserCreated($id)) {
+            if (auth()->user()->id == $this->postRepo->getUserCreated($id) || auth()->user()->role == 'admin') {
                 if ($this->postRepo->delete($id)) {
                     return response()->json(['Message' => Config::get('constants.RESPONSE.200')], Response::HTTP_OK);
                 } else return  response()->json(['Message' => Config::get('constants.RESPONSE.400')], Response::HTTP_BAD_REQUEST);

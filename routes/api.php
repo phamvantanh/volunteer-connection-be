@@ -21,7 +21,7 @@ header('Access-Control-Allow-Origin: *');
 
 Route::group([
   'middleware' => ['api'],
-  'prefix' => 'auth'
+  // 'prefix' => 'auth'
 
 ], function () {
   Route::post('/login', 'AuthController@login');
@@ -33,22 +33,68 @@ Route::group([
   Route::post('/email/resend', 'VerificationController@resend')->name('verification.resend');
   Route::get('/posts/search/{param}', 'PostController@searchByTitleOrContent');
   Route::get('/posts/{param}', 'PostController@show');
+  Route::get('/events/search/{param}', 'EventController@searchByTitleOrContent');
+  Route::get('/events/{param}', 'EventController@show');
+
+  Route::get('/follow/volunteer/{id}', 'FollowingController@getFollowingOfVolunteer');
+  Route::get('/follow/organization/{id}', 'FollowingController@getFollowingOfOrganization');
+
+  Route::get('/user/{param}', 'UserController@show');
+
+  Route::get('/homepage/posts', 'HomePageController@getPostList');
+  Route::get('/homepage/events', 'HomePageController@getEventList');
 
 
-  // Route::resources(['campaigns'=>'CampaignController']);
-
-  Route::group([
-    'middleware' => ['auth:api']
-
-  ], function () {
-    Route::get('/user-profile', 'AuthController@userProfile');
-    Route::post('/change-pass', 'AuthController@changePassWord');
-    Route::put('/update', 'AuthController@update');
-    // Route::resources(['posts' => 'PostController']);
-    Route::get('/posts', 'PostController@index');
-    Route::post('/posts',  'PostController@store');
-    Route::put('/posts/{id}',  'PostController@update');
-    Route::delete('/posts/{id}',  'PostController@destroy');
-
-  });
 });
+
+Route::group([
+  'middleware' => ['auth:api']
+
+], function () {
+  Route::get('/user-profile', 'AuthController@userProfile');
+  Route::post('/change-pass', 'AuthController@changePassWord');
+  Route::put('/update', 'AuthController@update');
+
+  Route::get('/posts', 'PostController@index');
+  Route::post('/post',  'PostController@store');
+  Route::put('/post/{id}',  'PostController@update');
+  Route::delete('/post/{id}',  'PostController@destroy');
+  
+  Route::resources(['categories' => 'CategoryController']);
+
+  Route::get('/events', 'EventController@index');
+  Route::post('/event',  'EventController@store');
+  Route::put('/event/{id}',  'EventController@update');
+  Route::delete('/event/{id}',  'EventController@destroy');
+
+  Route::get('/category/{id}/events', 'CategoryController@getEventofCategory');
+
+  Route::get('/register-list/{id}', 'EventController@getRegisterListOfEvent');
+  Route::post('/register-list/delete', 'RegisteredVolunteerController@removeVolunteer');
+  Route::put('/register-list/update', 'RegisteredVolunteerController@update');
+
+  Route::resources(['reports' => 'PostReportController']);
+
+  Route::get('/bookmarked/posts', 'BookmarkedPostController@getBookmarkedPostsOfUsers');
+  Route::post('/bookmarked/post',  'BookmarkedPostController@store');
+  Route::delete('/bookmarked/post/{post_id}',  'BookmarkedPostController@destroy');
+
+  Route::post('/register/event',  'RegisteredVolunteerController@store');
+  Route::delete('/register/event/{event_id}',  'RegisteredVolunteerController@destroy');
+  
+  Route::get('/bookmarked/events', 'BookmarkedEventController@getBookmarkedEventsOfUsers');
+  Route::post('/bookmarked/event',  'BookmarkedEventController@store');
+  Route::delete('/bookmarked/event/{event_id}',  'BookmarkedEventController@destroy');
+
+  Route::post('/follow', 'FollowingController@store');
+  Route::delete('/follow/{id}',  'FollowingController@destroy');
+
+  Route::get('/admin', 'AdminController@getDashBoardInfo');
+
+  Route::get('/users', 'UserController@index');
+  Route::post('/user',  'UserController@store');
+  Route::delete('/user/{id}',  'UserController@destroy');
+  Route::put('/user/{id}',  'UserController@update');
+
+});
+

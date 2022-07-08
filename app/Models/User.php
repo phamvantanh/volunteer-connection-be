@@ -7,6 +7,11 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use App\Notifications\VerifyEmail;
+use App\Models\Post;
+use App\Models\BookmarkedPost;
+use App\Models\BookmarkedEvent;
+use App\Models\Following;
+
 
 class User extends Authenticatable implements JWTSubject, MustVerifyEmail
 {
@@ -18,7 +23,7 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password','role','phone','date_of_birth'
+        'name', 'email', 'password','role','phone','date_of_birth','url_account','gender','about','is_disable','avatar_url'
     ];
 
     /**
@@ -59,5 +64,31 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     public function sendEmailVerificationNotification()
     {
         $this->notify(new VerifyEmail); // my notification
+    }
+
+    public function post() {
+        return $this->hasMany(Post::class);
+    }
+
+    public function bookmarkedPost() {
+        return $this->hasMany(BookmarkedPost::class);
+    }
+
+    public function bookmarkedEvent() {
+        return $this->hasMany(BookmarkedEvent::class);
+    }
+
+    public function Organization() {
+        return $this->hasMany(Following::class,'organization_id');
+    }
+
+    public function Volunteer() {
+        return $this->hasMany(Following::class,'volunteer_id');
+    }
+
+    public function unverify() {
+        $this->email_verified_at = null;
+
+        $this->save();
     }
 }
