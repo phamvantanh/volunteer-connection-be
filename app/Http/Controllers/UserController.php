@@ -107,6 +107,53 @@ class UserController extends Controller
 
     }
 
+    public function myEvent($param)
+    {
+        if ($user = $this->userRepo->findByIdOrUrl($param)) {
+            $events = $user->event;
+            foreach ($events as $event){
+                $event->category;
+            }
+            return response()->json(['events' => $events], Response::HTTP_OK);
+        } else return response()->json(['Message' => Config::get('constants.RESPONSE.404')], Response::HTTP_NOT_FOUND);
+
+    }
+    public function myPost($param)
+    {
+        if ($user = $this->userRepo->findByIdOrUrl($param)) {
+            $posts = $user->post;
+            return response()->json(['posts' => $posts], Response::HTTP_OK);
+        } else return response()->json(['Message' => Config::get('constants.RESPONSE.404')], Response::HTTP_NOT_FOUND);
+
+    }
+
+    public function myRegisteredEvent($param)
+    {
+        if ($user = $this->userRepo->findByIdOrUrl($param)) {
+            $rows = $user->registeredEvent;
+            $events=[];
+            foreach ($rows as $row){
+                $event=$row->event;
+                $event->category;
+                $event->user;
+                array_push($events, $event);
+            }
+            return response()->json(['events' => $events], Response::HTTP_OK);
+        } else return response()->json(['Message' => Config::get('constants.RESPONSE.404')], Response::HTTP_NOT_FOUND);
+
+    }
+
+    public function myCertificate($param)
+    {
+        if ($user = $this->userRepo->findByIdOrUrl($param)) {
+            $certificates = $user->certificate;
+            return response()->json(['certificates' => $certificates], Response::HTTP_OK);
+        } else return response()->json(['Message' => Config::get('constants.RESPONSE.404')], Response::HTTP_NOT_FOUND);
+
+    }
+
+
+
 
     /**
      * Update the specified resource in storage.
@@ -126,7 +173,7 @@ class UserController extends Controller
                     'email' => [
                         'email',
                         Rule::unique('users')->ignore($id)],
-                    'avatar_url'=>'string:max:500',
+                    'avatar_url'=>'nullable',
                     'role' => 'string',
                     'gender' => 'string',
                     'date_of_birth' => 'date',

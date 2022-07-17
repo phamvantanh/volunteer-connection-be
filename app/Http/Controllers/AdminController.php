@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\Event;
 use App\Models\Post;
 use App\Models\PostReport;
+use App\Services\ImgurService;
 
 
 
@@ -68,5 +69,15 @@ class AdminController extends Controller
         }
     }
 
+    public function saveImage()
+{
+    $data = request()->all();
+    $image = $data['image'];
+    // call service to upload image to imgur.com
+    $imageUrl = ImgurService::uploadImage($image->getRealPath());
+    // save your $imageUrl to DB if need
+    return response()->json(['link' => $imageUrl], Response::HTTP_OK);
+
+}
    
 }

@@ -36,7 +36,7 @@ class EventRepository extends BaseRepository implements EventRepositoryInterface
     }
 
     public function searchByTitleOrContent($param){
-        return Event::select('*')->where('is_published',1)
+        return Event::query()->where('is_published',1)
         ->where(function ($query) use ($param) {
             $query->where('title', 'like', '%'.$param.'%')
                 ->orwhere('content', 'like', '%'.$param.'%');

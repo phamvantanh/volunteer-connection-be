@@ -5,6 +5,8 @@ use App\Models\User;
 use App\Models\Category;
 use Illuminate\Database\Eloquent\SoftDeletes; // add soft delete
 use App\Models\RegisteredVolunteer;
+use App\Models\Comment;
+use App\Models\Review;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -38,6 +40,16 @@ class Event extends Model
     public function registerList()
     {
         return $this->hasMany(RegisteredVolunteer::class);
+    }
+
+    public function comment()
+    {
+        return $this->hasMany(Comment::class)->where('parent_id','=', null)->orderBy('created_at', 'DESC');
+    }
+
+    public function review()
+    {
+        return $this->hasMany(Review::class)->orderBy('created_at', 'DESC');
     }
 
 }

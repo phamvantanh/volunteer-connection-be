@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use App\Models\BookmarkedEvent;
+use App\Models\Comment;
 
 
 class EventController extends Controller
@@ -100,6 +101,9 @@ class EventController extends Controller
             $event->user;
             $event->category;
             $event->registerList;
+            if($event->is_published === 0 && auth()->user()->id !== $event->user_id){
+                return response()->json(['event' => []], Response::HTTP_OK);
+            }
             return response()->json(['event' => $event], Response::HTTP_OK);
         } else return response()->json(['Message' => Config::get('constants.RESPONSE.404')], Response::HTTP_NOT_FOUND);
 
@@ -129,6 +133,49 @@ class EventController extends Controller
         } else return response()->json(['Message' => Config::get('constants.RESPONSE.404')], Response::HTTP_NOT_FOUND);
 
     }
+
+    // public function fetchComments($param)
+    // {
+    //     if ($event = $this->eventRepo->findByIdOrSlug($param)) {
+    //         $listComment = $event->comment;
+    //         foreach ($listComment as $comment){
+    //             $comment->user;
+    //         }
+    //         return response()->json(['comments' => $listComment], Response::HTTP_OK);
+    //     } else return response()->json(['Message' => Config::get('constants.RESPONSE.404')], Response::HTTP_NOT_FOUND);
+
+    // }
+
+    public function fetchComments2($param)
+    {
+        if ($event = $this->eventRepo->findByIdOrSlug($param)) {
+            $listComment = $event->comment;
+            foreach ($listComment as $comment){
+                $commentReplies=Comment::select('*')->where('parent_id',$comment->id)->get();
+                foreach ($commentReplies as $commentReply){
+                    $commentReply->user;
+                }
+                $comment->user;
+                $comment['replies']=$commentReplies;
+            }
+            return response()->json(['comments' => $listComment], Response::HTTP_OK);
+        } else return response()->json(['Message' => Config::get('constants.RESPONSE.404')], Response::HTTP_NOT_FOUND);
+
+    }
+
+    public function fetchReviews($param)
+    {
+        if ($event = $this->eventRepo->findByIdOrSlug($param)) {
+            $reviews = $event->review;
+            foreach ($reviews as $review){
+                $review->user;
+            }
+            return response()->json(['reviews' => $reviews], Response::HTTP_OK);
+        } else return response()->json(['Message' => Config::get('constants.RESPONSE.404')], Response::HTTP_NOT_FOUND);
+
+    }
+
+
 
     public function getRegisterListOfEvent($param)
     {
@@ -162,7 +209,8 @@ class EventController extends Controller
                 'content',
                 'deadline',
                 'status',
-                'is_published'
+                'is_published',
+                'event_thumbnail'
             );
 
             $infoUpdate['title'] = $request->input('title');
@@ -171,6 +219,7 @@ class EventController extends Controller
             $infoUpdate['deadline'] = $request->input('deadline');
             $infoUpdate['status'] = $request->input('status');
             $infoUpdate['is_published'] = $request->input('is_published');
+            $infoUpdate['event_thumbnail'] = $request->input('event_thumbnail');
             $infoUpdate['slug']= Str::slug($request->input('title'))."-".rand();
 
             if ($event = $this->eventRepo->update($id, $infoUpdate)) {

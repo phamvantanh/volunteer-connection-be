@@ -44,6 +44,18 @@ Route::group([
   Route::get('/homepage/posts', 'HomePageController@getPostList');
   Route::get('/homepage/events', 'HomePageController@getEventList');
 
+  Route::get('/user/{param}/event', 'UserController@myEvent');
+  Route::get('/user/{param}/post', 'UserController@myPost');
+  Route::get('/user/{param}/register-event', 'UserController@myRegisteredEvent');
+
+  Route::get('/certificate/{param}', 'CertificateController@show');
+  // Route::get('/certificates', 'CertificateController@index');
+  Route::get('/user/{param}/certificate', 'UserController@myCertificate');
+  
+  // Route::get('/event/{id}/comments', 'EventController@fetchComments');
+  Route::get('/event/{id}/comments', 'EventController@fetchComments2');
+
+  Route::get('/event/{id}/reviews', 'EventController@fetchReviews');
 
 });
 
@@ -95,6 +107,18 @@ Route::group([
   Route::post('/user',  'UserController@store');
   Route::delete('/user/{id}',  'UserController@destroy');
   Route::put('/user/{id}',  'UserController@update');
+
+  Route::delete('/comments/{id}',  'CommentController@destroy');
+  Route::put('/comments/{id}',  'CommentController@update');
+  Route::post('/comments', 'CommentController@store');
+
+  Route::delete('/reviews/{id}',  'ReviewController@destroy');
+  Route::put('/reviews/{id}',  'ReviewController@update');
+  Route::post('/reviews', 'ReviewController@store');
+
+  Route::post('/upload', 'AdminController@saveImage');
+
+
 
 });
 

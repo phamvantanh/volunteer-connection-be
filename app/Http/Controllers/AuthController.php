@@ -191,21 +191,27 @@ class AuthController extends Controller
   {
     $validator = Validator::make($request->all(), [
       'old_password' => 'required|string|min:6',
-      'new_password' => 'required|string|confirmed|min:6',
+      'new_password' => 'required|string|min:6',
+      'new_confirm_password' => ['same:new_password'],
+
     ]);
 
     if ($validator->fails()) {
       return response()->json($validator->errors()->toJson(), 422);
     }
     $userId = auth()->user()->id;
+    if(!Hash::check($request->old_password, auth()->user()->password)){
+      return response()->json([
+        'message' => 'Sai mật khẩu',
+      ], 401);
+    }
 
     $user = User::where('id', $userId)->update(
       ['password' =>  Hash::make($request->new_password)]
     );
 
     return response()->json([
-      'message' => 'User successfully changed password',
-      'user' => $user,
+      'message' => 'Đổi mật khẩu thành công',
     ], 200);
   }
 }

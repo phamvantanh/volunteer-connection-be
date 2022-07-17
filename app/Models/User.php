@@ -11,6 +11,9 @@ use App\Models\Post;
 use App\Models\BookmarkedPost;
 use App\Models\BookmarkedEvent;
 use App\Models\Following;
+use App\Models\Event;
+use App\Models\RegisteredVolunteer;
+use App\Models\Certificate;
 
 
 class User extends Authenticatable implements JWTSubject, MustVerifyEmail
@@ -70,6 +73,10 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         return $this->hasMany(Post::class);
     }
 
+    public function event() {
+        return $this->hasMany(Event::class);
+    }
+
     public function bookmarkedPost() {
         return $this->hasMany(BookmarkedPost::class);
     }
@@ -84,6 +91,14 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
 
     public function Volunteer() {
         return $this->hasMany(Following::class,'volunteer_id');
+    }
+
+    public function registeredEvent() {
+        return $this->hasMany(RegisteredVolunteer::class);
+    }
+
+    public function certificate() {
+        return $this->hasMany(Certificate::class);
     }
 
     public function unverify() {
