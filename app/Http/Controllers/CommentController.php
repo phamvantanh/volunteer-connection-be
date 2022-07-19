@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Event;
-
+use Illuminate\Support\Facades\DB;
 
 class CommentController extends Controller
 {
@@ -61,6 +61,17 @@ class CommentController extends Controller
                 'parent_id' => $params['parent_id'],
                 'user_id' => auth()->user()->id 
             ])) {
+                $eventInfo=Event::select('*')->where('id',$params['event_id'])->first();
+                if($eventInfo && $eventInfo->user_id !== auth()->user()->id){
+                    DB::table('notifications')->insert([
+                        'user_id' => $eventInfo->user_id,
+                        'event_id' => $params['event_id'],
+                        'content' => auth()->user()->name. ' đã bình luận về bài viết của bạn',
+                        'source_user_id' => auth()->user()->id,
+                        'created_at' => date_create()->format('Y-m-d H:i:s'),
+                        'updated_at'=> date_create()->format('Y-m-d H:i:s'),
+                    ]);
+                }
                 return response()->json(['comment' => $this->commentRepo->getLatestCreate()], Response::HTTP_OK);
             } else return response()->json(['Message' => Config::get('constants.RESPONSE.400')], Response::HTTP_BAD_REQUEST);
         } catch (\Exception $e) {

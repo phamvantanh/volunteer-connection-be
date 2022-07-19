@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use App\Models\BookmarkedEvent;
 use App\Models\Comment;
+use App\Models\Certificate;
 
 
 class EventController extends Controller
@@ -183,6 +184,8 @@ class EventController extends Controller
             $lists = $event->registerList;
             foreach ($lists as $list){
                 $list->user;
+                $certificate=Certificate::select('url')->where('event_id',$list->event_id)->where('user_id',$list->user_id)->first();
+                $list['certificate']=$certificate;
             }
             return response()->json(['user_list' => $event->registerList], Response::HTTP_OK);
         } else return response()->json(['Message' => Config::get('constants.RESPONSE.404')], Response::HTTP_NOT_FOUND);

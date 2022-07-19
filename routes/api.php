@@ -118,6 +118,11 @@ Route::group([
 
   Route::post('/upload', 'AdminController@saveImage');
 
+  Route::post('/certificates', 'CertificateController@store');
+  Route::put('/certificates/{id}', 'CertificateController@update');
+  Route::delete('/certificates/{id}', 'CertificateController@destroy');
+
+  Route::put('/notification/{id}', 'UserController@seenNoti');
 
 
 });

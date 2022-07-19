@@ -134,8 +134,15 @@ class AuthController extends Controller
    */
   public function userProfile()
   {
+    $user= auth()->user();
+    $lists = $user->notification;
+    if($lists){
+      foreach ($lists as $list){
+        $list->event;
+    }
+    }
     return response()->json([
-      'user' => auth()->user()
+      'user' => $user
     ], 200);
   }
 

@@ -45,17 +45,33 @@ class CertificateController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|between:1,255',
+                'organization_name'=> 'required|string|between:1,255',
+                'issue_date' => 'required|date',
+                'event_id' => 'nullable',
+                'user_id' => 'required',
+                'url' =>   'required',
               ]);
 
             if ($validator->fails()) {
                 return response()->json($validator->errors()->toJson(), 422);
             }
             $params['name'] = $request->name;
+            $params['organization_name'] = $request->organization_name;
+            $params['issue_date'] = $request->issue_date;
+            $params['event_id'] = $request->event_id;
+            $params['user_id'] = $request->user_id;
+            $params['url'] = $request->url;
 
-            if ($this->categoryRepo->create([
+            if ($this->certificateRepo->create([
                 'name' => $params['name'],
+                'organization_name' => $params['organization_name'],
+                'issue_date' => $params['issue_date'],
+                'event_id' =>  $params['event_id'],
+                'user_id' =>   $params['user_id'],
+                'url' =>   $params['url'],
+                'is_published' => 1
             ])) {
-                return response()->json(['category' => $this->categoryRepo->getLatestCreate()], Response::HTTP_OK);
+                return response()->json(['certificate' => $this->certificateRepo->getLatestCreate()], Response::HTTP_OK);
             } else return response()->json(['Message' => Config::get('constants.RESPONSE.400')], Response::HTTP_BAD_REQUEST);
         } catch (\Exception $e) {
             return response()->json([
@@ -89,20 +105,29 @@ class CertificateController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            if (auth()->user()->role != 'admin') {
-                return response()->json(['Message' => "Not permision for your account"], Response::HTTP_FORBIDDEN);
-            }
             $validator = Validator::make($request->all(), [
-                'name' => 'required|string|between:1,255|unique:category',
-              ]);
+                    'name' => 'required|string|between:1,255',
+                    'organization_name'=> 'required|string|between:1,255',
+                    'issue_date' => 'required|date',
+                    'event_id' => 'nullable',
+                    'user_id' => 'required',
+                    'url' =>   'required',
+                    'is_published' => 'required'
+                  ]);           
 
             if ($validator->fails()) {
                 return response()->json($validator->errors()->toJson(), 422);
             }
 
-            $infoUpdate['name'] =$request->name;
-            if ($category = $this->categoryRepo->update($id, $infoUpdate)) {
-                return response()->json(['category' => $this->categoryRepo->getLatestUpdate()], Response::HTTP_OK);
+            $infoUpdate['is_published'] =$request->is_published;
+            $infoUpdate['name'] = $request->name;
+            $infoUpdate['organization_name'] = $request->organization_name;
+            $infoUpdate['issue_date'] = $request->issue_date;
+            $infoUpdate['event_id'] = $request->event_id;
+            $infoUpdate['user_id'] = $request->user_id;
+            $infoUpdate['url'] = $request->url;
+            if ($category = $this->certificateRepo->update($id, $infoUpdate)) {
+                return response()->json(['certificate' => $this->certificateRepo->getLatestUpdate()], Response::HTTP_OK);
             } else return  response()->json(['Message' => Config::get('constants.RESPONSE.400')], Response::HTTP_BAD_REQUEST);
         } catch (\Exception $e) {
             return response()->json(['Message' => Config::get('constants.RESPONSE.404')], Response::HTTP_NOT_FOUND);

@@ -14,6 +14,7 @@ use App\Models\Following;
 use App\Models\Event;
 use App\Models\RegisteredVolunteer;
 use App\Models\Certificate;
+use App\Models\Notification;
 
 
 class User extends Authenticatable implements JWTSubject, MustVerifyEmail
@@ -105,5 +106,9 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         $this->email_verified_at = null;
 
         $this->save();
+    }
+
+    public function notification() {
+        return $this->hasMany(Notification::class);
     }
 }

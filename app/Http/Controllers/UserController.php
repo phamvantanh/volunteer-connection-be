@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use App\Models\Notification;
 
 
 class UserController extends Controller
@@ -230,6 +231,18 @@ class UserController extends Controller
             } else return response()->json(['Message' => "Not permision"], Response::HTTP_FORBIDDEN);
         } catch (\Exception $e) {
             return response()->json(['Message' => Config::get('constants.RESPONSE.404')], Response::HTTP_NOT_FOUND);
+        }
+    }
+
+    public function seenNoti($id)
+    {
+         //
+         try {
+                $noti=Notification::select('*')->where('id',$id)->first();
+                $noti->seenNoti;
+                return response()->json(['Message' =>'Đánh dấu đã đọc'], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json(['Message' => 'OK'], Response::HTTP_OK);
         }
     }
 }
